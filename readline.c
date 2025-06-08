@@ -4,8 +4,7 @@ static int	read_cnt;
 static char	*read_ptr;
 static char	read_buf[MAXLINE];
 
-static ssize_t
-my_read(int fd, char *ptr)
+static ssize_t my_read(int fd, char *ptr)
 {
 
 	if (read_cnt <= 0) {
@@ -24,8 +23,7 @@ again:
 	return(1);
 }
 
-ssize_t
-readline(int fd, void *vptr, size_t maxlen)
+ssize_t readline(int fd, void *vptr, size_t maxlen)
 {
 	ssize_t	n, rc;
 	char	c, *ptr;
@@ -35,29 +33,26 @@ readline(int fd, void *vptr, size_t maxlen)
 		if ( (rc = my_read(fd, &c)) == 1) {
 			*ptr++ = c;
 			if (c == '\n')
-				break;	/* newline is stored, like fgets() */
+				break;	
 		} else if (rc == 0) {
 			*ptr = 0;
-			return(n - 1);	/* EOF, n - 1 bytes were read */
+			return(n - 1);
 		} else
-			return(-1);		/* error, errno set by read() */
+			return(-1);	
 	}
 
-	*ptr = 0;	/* null terminate like fgets() */
+	*ptr = 0;
 	return(n);
 }
 
-ssize_t
-readlinebuf(void **vptrptr)
+ssize_t readlinebuf(void **vptrptr)
 {
 	if (read_cnt)
 		*vptrptr = read_ptr;
 	return(read_cnt);
 }
-/* end readline */
 
-ssize_t
-Readline(int fd, void *ptr, size_t maxlen)
+ssize_t Readline(int fd, void *ptr, size_t maxlen)
 {
 	ssize_t		n;
 

@@ -1,12 +1,19 @@
 #include "../unp.h"
+#include "../sum.h"
 
+void str_echo(int sockfd)
+{
+	ssize_t			n;
+	struct args		args;
+	struct result	result;
 
-void str_echo(int sockfd){
-    ssize_t n;
-    char buf[MAXLINE];
+	for ( ; ; ) {
+		if ( (n = Readn(sockfd, &args, sizeof(args))) == 0)
+			return;
 
-    while ((n = read(sockfd, buf, MAXLINE)) > 0)
-		Writen(sockfd, buf, n);
+		result.sum = args.arg1 + args.arg2;
+		Writen(sockfd, &result, sizeof(result));
+	}
 }
 
 int main(int argc, char **argv) {
@@ -14,6 +21,7 @@ int main(int argc, char **argv) {
     int                 listenfd, connfd;
     pid_t               childpid;
     socklen_t           clilen;
+    void                sig_chld(int);
 
     struct sockaddr_in  cliaddr, servaddr;
 
@@ -40,11 +48,19 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
+    Signal(SIGCHLD, sig_chld);
+
     printf("Server listening on port %d\n", SERV_PORT);
     
     for(;;){
         clilen = sizeof(cliaddr);
-        connfd = accept(listenfd, (struct sockaddr *)&cliaddr, (socklen_t*)&clilen);
+        if(( connfd = accept(listenfd, (struct sockaddr *)&cliaddr, (socklen_t*)&clilen)) < 0){
+            if(errno == EINTR){
+                continue;
+            } else {
+                err_sys("accept error");
+            }
+        }
       
         if((childpid = fork())==0){
             close(listenfd);

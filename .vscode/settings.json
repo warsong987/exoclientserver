@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "unp.h": "c",
+        "signal.h": "c",
+        "sum.h": "c"
+    }
+}

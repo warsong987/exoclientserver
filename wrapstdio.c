@@ -1,7 +1,3 @@
-/*
- * Standard I/O wrapper functions.
- */
-
 #include	"unp.h"
 
 char *
