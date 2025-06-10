@@ -24,8 +24,10 @@ void str_cli(FILE *fp, int sockfd)
 
 int main(int argc, char **argv) 
 {
-    int     i, sockfd[5];
+    int                 i, sockfd[5];
     struct  sockaddr_in servaddr;
+    struct  linger      lin = {1, 0};
+    int                 len_linger;
 
     if(argc != 2)
         err_quit("usage: tcpcli<IPaddress>");
@@ -45,6 +47,17 @@ int main(int argc, char **argv)
         if(connect(sockfd[i], (struct sockaddr*)&servaddr, sizeof(servaddr))<0) {
             err_sys("\nConnection Failed \n");
         }
+    }
+
+    len_linger = sizeof(lin);
+
+    if(setsockopt(sockfd[0], SOL_SOCKET, SO_LINGER, &lin, sizeof(lin))==-1) 
+    {
+        perror("Failed setting linger param");
+    }
+    else
+    {
+        printf("Success setting linger param\n");
     }
 
     str_cli(stdin, sockfd[0]);
